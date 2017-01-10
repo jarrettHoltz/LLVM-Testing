@@ -1,0 +1,5 @@
+/home/jaholtz/llvm-testing/skeleton/CMakeFiles/edit_cache.dir
+/home/jaholtz/llvm-testing/skeleton/CMakeFiles/rebuild_cache.dir
+/home/jaholtz/llvm-testing/skeleton/skeleton/CMakeFiles/edit_cache.dir
+/home/jaholtz/llvm-testing/skeleton/skeleton/CMakeFiles/rebuild_cache.dir
+/home/jaholtz/llvm-testing/skeleton/skeleton/CMakeFiles/SkeletonPass.dir
