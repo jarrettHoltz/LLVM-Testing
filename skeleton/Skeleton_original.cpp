@@ -53,16 +53,15 @@ namespace {
              ValueSymbolTable* symbolTable = B.getValueSymbolTable();
             if(pointer->hasName() && pointer->getName().str() == "num") {
              Value* start_name = builder.CreateGlobalString(pointer->getName());
-             
              Value* args[] = {start_name, pointer};
-//              builder.CreateCall(initialFunc, args);
-             std::vector<Value*> arguements;
+             builder.CreateCall(initialFunc, args);
+             
             for(StringMapIterator<Value *> iter=symbolTable->begin(); iter != 
                 symbolTable->end(); iter++) {
 //               iter->first->dump();
               Value* iter_value = iter->second;
               if(iter_value->hasName()) {
-//                   iter_value->dump();
+                  iter_value->dump();
                   if(!prev_table->empty()) {
                   Value* last_value = prev_table->lookup(iter_value->getName());
                   if(iter_value->getName().str() != "argc" &&
@@ -70,28 +69,16 @@ namespace {
                   ) {
                   Value* name = 
                       builder.CreateGlobalString(iter_value->getName());
-                      arguements.push_back(name);
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-                      arguements.push_back(iter_value);
-//                    Value* args2[] = {name, iter_value};
-//                    builder3.CreateCall(assignedFunc, args2);
+                   Value* args2[] = {name, iter_value};
+                   builder3.CreateCall(assignedFunc, args2);
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
                   }
                   }
               }
             }
-              
-              Value* size = ConstantInt::get(Type::getInt32Ty(Ctx), arguements.size()/2);
-              arguements.insert(arguements.begin(),size);
-              ArrayRef<Value*>*  args2 = new ArrayRef<Value*>(arguements);
-              if(arguements.size() > 0) {
-//                 Value* args2[] = {size, arguements[0], arguements[1]};
-              CallInst* inst = builder3.CreateCall(assignedFunc, *args2);
-              CallInst* inst2 = builder.CreateCall(initialFunc, *args2);
-              inst->dump();
-              }
               prev_table = symbolTable;
              }
              

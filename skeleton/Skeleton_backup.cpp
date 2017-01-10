@@ -62,7 +62,7 @@ namespace {
 //               iter->first->dump();
               Value* iter_value = iter->second;
               if(iter_value->hasName()) {
-//                   iter_value->dump();
+                  iter_value->dump();
                   if(!prev_table->empty()) {
                   Value* last_value = prev_table->lookup(iter_value->getName());
                   if(iter_value->getName().str() != "argc" &&
@@ -70,11 +70,11 @@ namespace {
                   ) {
                   Value* name = 
                       builder.CreateGlobalString(iter_value->getName());
-                      arguements.push_back(name);
+//                       arguements.push_back(name);
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-                      arguements.push_back(iter_value);
+//                       arguements.push_back(iter_value);
 //                    Value* args2[] = {name, iter_value};
 //                    builder3.CreateCall(assignedFunc, args2);
 //                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
@@ -83,15 +83,10 @@ namespace {
               }
             }
               
-              Value* size = ConstantInt::get(Type::getInt32Ty(Ctx), arguements.size()/2);
-              arguements.insert(arguements.begin(),size);
-              ArrayRef<Value*>*  args2 = new ArrayRef<Value*>(arguements);
-              if(arguements.size() > 0) {
-//                 Value* args2[] = {size, arguements[0], arguements[1]};
-              CallInst* inst = builder3.CreateCall(assignedFunc, *args2);
-              CallInst* inst2 = builder.CreateCall(initialFunc, *args2);
-              inst->dump();
-              }
+//               Value* size = ConstantInt::get(Type::getInt32Ty(Ctx), arguements.size() / 2);
+//               arguements.insert(arguements.begin(), size);
+//               ArrayRef<Value*>*  args2 = new ArrayRef<Value*>(arguements);
+//               builder3.CreateCall(assignedFunc, *args2);
               prev_table = symbolTable;
              }
              
