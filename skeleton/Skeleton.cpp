@@ -11,8 +11,37 @@
 #include "llvm/IR/ValueMap.h"
 #include <iostream>
 using namespace llvm;
-
 namespace {
+
+bool RelevantUsers(Value* value, std::string relevance) {
+  bool relevant = false;
+//   std::cout << "NumUsers2: " << value->getNumUses() <<  std::endl;
+  for(auto U : value->users()){  // U is of type User*
+    if (auto J= dyn_cast<Instruction>(U)){
+
+      if (!J->isIdenticalTo((dyn_cast<Instruction>(value)))) {
+
+        if (J->getOpcode() == Instruction::Store) {
+          llvm::StoreInst *user = dyn_cast<llvm::StoreInst>(J);
+          Value *pointer = user->getPointerOperand();
+          if(pointer->hasName() && pointer->getName().str() == relevance) {
+            return true;
+          }
+          if (pointer != value) {
+          if (RelevantUsers(pointer, relevance)) {
+            return true;
+          }
+          }
+        }
+        if (RelevantUsers(J, relevance)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
   struct SkeletonPass : public FunctionPass {
     static char ID;
     SkeletonPass() : FunctionPass(ID) {}
@@ -29,84 +58,27 @@ namespace {
       Constant *assignedFunc = F.getParent()->getOrInsertFunction(
         "LogAssigned", Type::getVoidTy(Ctx), Type::getInt32Ty(Ctx), NULL
       );
-      ValueSymbolTable* prev_table = new ValueSymbolTable();
+      int x = 0;
       for (auto &B : F) {
-       
+
         for (auto &I : B) {
-         
+          std::cout << "Instruction" << std::endl;
+//           I.dump();
+          bool relevant = false;
           if (I.getOpcode() == Instruction::Store) {
             // Insert at the point where the instruction `op` appears.
             llvm::StoreInst *op = dyn_cast<llvm::StoreInst>(&I);
-//             op->dump();
-            IRBuilder<> builder(op);
-            IRBuilder<> builder2(op);
-            IRBuilder<> builder3(op);
-            builder.SetInsertPoint(&B, --builder.GetInsertPoint());
-            builder.SetInsertPoint(&B, --builder.GetInsertPoint());
-            builder3.SetInsertPoint(&B, ++builder3.GetInsertPoint());
-            // Insert a call to our function.
-            Value *value = op->getValueOperand();
             Value *pointer = op->getPointerOperand();
-            
-//             symbolTable->dump();
-//             ValueMap::iterator = symbolTable->begin();
-             ValueSymbolTable* symbolTable = B.getValueSymbolTable();
-            if(pointer->hasName() && pointer->getName().str() == "num") {
-             Value* start_name = builder.CreateGlobalString(pointer->getName());
-             
-             Value* args[] = {start_name, pointer};
-//              builder.CreateCall(initialFunc, args);
-             std::vector<Value*> arguements;
-            for(StringMapIterator<Value *> iter=symbolTable->begin(); iter != 
-                symbolTable->end(); iter++) {
-//               iter->first->dump();
-              Value* iter_value = iter->second;
-              if(iter_value->hasName()) {
-//                   iter_value->dump();
-                  if(!prev_table->empty()) {
-                  Value* last_value = prev_table->lookup(iter_value->getName());
-                  if(iter_value->getName().str() != "argc" &&
-                     iter_value->getName().str() != "argv"
-                  ) {
-                  Value* name = 
-                      builder.CreateGlobalString(iter_value->getName());
-                      arguements.push_back(name);
-//                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-//                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-//                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-                      arguements.push_back(iter_value);
-//                    Value* args2[] = {name, iter_value};
-//                    builder3.CreateCall(assignedFunc, args2);
-//                   builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-                  }
-                  }
-              }
+            relevant = RelevantUsers(pointer, "output");
             }
-              
-              Value* size = ConstantInt::get(Type::getInt32Ty(Ctx), arguements.size()/2);
-              arguements.insert(arguements.begin(),size);
-              ArrayRef<Value*>*  args2 = new ArrayRef<Value*>(arguements);
-              if(arguements.size() > 0) {
-//                 Value* args2[] = {size, arguements[0], arguements[1]};
-              CallInst* inst = builder3.CreateCall(assignedFunc, *args2);
-              CallInst* inst2 = builder.CreateCall(initialFunc, *args2);
-              inst->dump();
-              }
-              prev_table = symbolTable;
-             }
-             
-
-           
-//             builder2.CreateCall(logFunc, rhs);
-//             return true;
+            I.dump();
+            std::cout << "RELEVANCE: " <<  relevant << std::endl;
           }
-//            std::cout << "loop" << std::endl;
+
         }
-        
+        return false;
       }
 
-      return false;
-    }
   };
 }
 
