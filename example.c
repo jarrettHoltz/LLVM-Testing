@@ -17,13 +17,20 @@ int main(int argc, const char** argv) {
 //     num2 = num + 1;
 //     eleven = num2 + 1;
     int twelve = 1;
+    
     twelve = simple_add(twelve, 3);
+    
     twelve = simple_add(twelve, twelve);
+    
     int output = twelve;
+    
     twelve = 5;
+    
 //     output = eleven;
 //     add(0, 1, &output);
+    
     output = simple_add(0, 1);
+    
 //     scanf("%i", &num);
 //     printf("%i\n", num - 2);
 

@@ -66,13 +66,36 @@ bool RelevantUsers(Value* value, std::string relevance) {
 //           I.dump();
           bool relevant = false;
           if (I.getOpcode() == Instruction::Store) {
+            
             // Insert at the point where the instruction `op` appears.
             llvm::StoreInst *op = dyn_cast<llvm::StoreInst>(&I);
+            IRBuilder<> builder(op);
+            IRBuilder<> builder2(op);
+            IRBuilder<> builder3(op);
+            builder.SetInsertPoint(&B, builder.GetInsertPoint());
+//             builder.SetInsertPoint(&B, --builder.GetInsertPoint());
+            builder3.SetInsertPoint(&B, ++builder3.GetInsertPoint());
+            Value *value = op->getValueOperand();
             Value *pointer = op->getPointerOperand();
             relevant = RelevantUsers(pointer, "output");
-            }
             I.dump();
             std::cout << "RELEVANCE: " <<  relevant << std::endl;
+            if(relevant) {
+              std::vector<Value*> arguements;
+              Value* name =
+                      builder.CreateGlobalString(pointer->getName());
+                      arguements.push_back(name);
+                      arguements.push_back(pointer);
+              Value* size = ConstantInt::get(Type::getInt32Ty(Ctx), arguements.size()/2);
+              arguements.insert(arguements.begin(),size);
+              ArrayRef<Value*>*  args2 = new ArrayRef<Value*>(arguements);
+              if(arguements.size() > 0) {
+                CallInst* inst = builder3.CreateCall(assignedFunc, *args2);
+                CallInst* inst2 = builder.CreateCall(initialFunc, *args2);
+              }
+            }
+            }
+            
           }
 
         }
